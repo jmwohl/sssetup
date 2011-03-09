@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# REQUIREMENTS: 
+# - git client
+# - piston rubygem
+# - superuser access
+
+# TODO: Check that the root directory is empty besides the .git folder
+
+ssv='master'
+database=
+dbu='root'
+dbp=''
+
+if [ $(id -u) = "0" ]; 
+then
+	# Parse 
+	while [ "$1" != "" ]; do
+	    case $1 in
+	        -ssv | --version )          shift
+	                                	ssv=$1
+										echo "Installing SilverStripe version "$ssv
+	                                	;;
+			-db | --database )          shift
+	                                	database=$1
+										echo $database
+	                                	;;
+	        -dbu | --databaseuser )    	shift
+										dbu=$1
+										echo $dbu
+	                                	;;
+			-dbp | --databasepass )     shift
+										dbp=$1
+										echo $dbp
+										;;
+			-h | --help )           	usage
+										exit
+										;;
+	        * )                     	usage
+	                                	exit 1
+	    esac
+	    shift
+	done
+	
+	# Make sure a database has been indicated
+	if [ "$database" = "" ]; then
+		echo "No database selected.  Please use the -db [database_name] directive."
+		exit 1
+	fi
+	
+	# Download and extract latest release
+	sszip="ss"$ssv".zip"
+	ssurl="https://github.com/silverstripe/silverstripe-installer/zipball/"$ssv
+	echo $ssurl
+	curl -L -o $sszip $ssurl
+	tar -vxf $sszip
+	rm -R $sszip
+	
+	# Move the extracted files into our root
+	mv silverstripe-silverstripe-installer*/* ./
+	rm -R silverstripe-silverstripe-installer*
+	
+	# Use piston to get the newest version of the core modules (sapphire, cms, and l)
+	# TODO: Figure out where to put this file — another github project?  Maybe a github project for this whole thing?
+	tools/new-project -t ~/src/template.php
+	
+	# Add to git repo and do an initial commit
+	git add *
+	git commit -m "initial commit"
+	
+	exit 0
+else
+	echo "You do not have permission to run sssetup."
+	exit 1
+fi
