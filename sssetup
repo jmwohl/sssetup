@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # REQUIREMENTS: 
+# - sake installed as executable
+# - _ss_environments.php file in place.
 # - git client
 # - piston rubygem
 # - superuser access
@@ -12,6 +14,7 @@ database=
 dbu='root'
 dbp=''
 template=
+
 
 if [ $(id -u) = "0" ]; 
 then
@@ -67,15 +70,52 @@ then
 	
 	# Move the extracted files into our root
 	mv silverstripe-silverstripe-installer*/* ./
+	mv silverstripe-silverstripe-installer*/.* ./
 	rm -R silverstripe-silverstripe-installer*
 	
-	# Use piston to get the newest version of the core modules (sapphire, cms, and l)
-	# TODO: Figure out where to put this file — another github project?  Maybe a github project for this whole thing?
-	# tools/new-project -t $template
+	# Use piston to get the newest version of the core modules (sapphire, cms) and extension
+	# modules indicated in the template file.
+	tools/new-project -t "$template"
+	
+	# Add local cache folder
+	mkdir silverstripe-cache
+	sudo chmod -R 777 silverstripe-cache
+	
+	# Add the .htaccess file, and set all necessary file permissions
+	# TODO
+	chmod 777 .htaccess
+	chmod -R 777 assets
+	chmod 777 mysite/_config.php
+	
+	# Ignore the cache and assets folders
+	touch .gitignore
+	echo ".DS_Store
+		silverstripe-cache
+		assets
+	" > .gitignore
+	
+	# Add database to the mysite _config.php file
+	search_string="\$database = '';"
+	replace_string="\$database = '$database';"
+	sed -i '' "s/$search_string/$replace_string/g" mysite/_config.php
+	
+	# Switch to the default html5 boilerplate theme
+	sed -i '' 's/blackcandy/html5/g' mysite/_config.php
+	
+	# Add the base URL to the .htaccess file
+	# TODO: Add HTML5 Boilerplate base .htaccess rules
+	$search_string="RewriteEngine On"
+	$replace_string="RewriteEngine On
+	RewriteBase /
+	"
+	sed -i '' "s/$search_string/$replace_string/g" .htaccess
 	
 	# Add to git repo and do an initial commit
 	git add *
-	git commit -m "initial commit"
+	sudo git commit -am "initial commit"
+	
+	# Build the database!
+	sake dev/build
 	
 	exit 0
 else
