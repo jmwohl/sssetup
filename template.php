@@ -25,11 +25,10 @@ $template = array(
 		'user' => 'unclecheese', 
 		'project' => 'Uploadify',
 		'branch' => SAPPHIRE_CURRENT_BRANCH
-	))
+	)),
 	'themes/html5' => new Github(array(
 		'user' => 'jmwohl', 
 		'project' => 'SilverStripe-HTML5Boilerplate-Theme',
 		'branch' => SAPPHIRE_CURRENT_BRANCH
 	))
 );
-
