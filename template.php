@@ -16,6 +16,16 @@ $template = array(
 		'project' => 'silverstripe-cms',
 		'branch' => SAPPHIRE_CURRENT_BRANCH
 	)),
+	'dataobjectmanager' => new Github(array(
+		'user' => 'unclecheese', 
+		'project' => 'DataObjectManager',
+		'branch' => SAPPHIRE_CURRENT_BRANCH
+	)),
+	'uploadify' => new Github(array(
+		'user' => 'unclecheese', 
+		'project' => 'Uploadify',
+		'branch' => SAPPHIRE_CURRENT_BRANCH
+	))
 	'themes/html5' => new Github(array(
 		'user' => 'jmwohl', 
 		'project' => 'SilverStripe-HTML5Boilerplate-Theme',

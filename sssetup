@@ -11,13 +11,17 @@ ssv='master'
 database=
 dbu='root'
 dbp=''
+template=
 
 if [ $(id -u) = "0" ]; 
 then
 	# Parse 
 	while [ "$1" != "" ]; do
 	    case $1 in
-	        -ssv | --version )          shift
+	        -t | --template )          shift
+	                                	template=$1
+	                                	;;
+			-ssv | --version )          shift
 	                                	ssv=$1
 										echo "Installing SilverStripe version "$ssv
 	                                	;;
@@ -44,7 +48,12 @@ then
 	
 	# Make sure a database has been indicated
 	if [ "$database" = "" ]; then
-		echo "No database selected.  Please use the -db [database_name] directive."
+		echo "No database selected.  Please use -db [database_name]."
+		exit 1
+	fi
+	
+	if [ "$template" = "" ]; then
+		echo "No piston template file selected.  Please use -t [template_file]."
 		exit 1
 	fi
 	
@@ -62,7 +71,7 @@ then
 	
 	# Use piston to get the newest version of the core modules (sapphire, cms, and l)
 	# TODO: Figure out where to put this file — another github project?  Maybe a github project for this whole thing?
-	tools/new-project -t ~/src/template.php
+	# tools/new-project -t $template
 	
 	# Add to git repo and do an initial commit
 	git add *
