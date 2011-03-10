@@ -1,0 +1,66 @@
+Authored by Jonathan Wohl
+Last Updated 03/10/2011
+
+WARNING: USE THIS SCRIPT AT YOUR OWN FRIGGIN RISK.
+
+NOTE: The shell commands included are for reference only — don't copy/paste them.
+
+ANOTHER NOTE: This script is by no means meant to be a one-stop solution for anything.  In order for it to work best for you, you'll need to customize it.  I highly encourage that.
+
+
+
+This is a simple script that automates the setup of a new SilverStripe project.  It's based on SilverStripe's documentation of the Installation from Source Control method, found here:
+
+http://doc.silverstripe.org/sapphire/en/installation/from-source
+
+Included in this git project is an additional template.php file that adds several things to the one included in the SilverStripe installer project.  Namely, it adds unclecheese's DataObjectManager and Uploadify modules, as well as my own HTML5 Boilerplate Theme project (a SS version of the HTML5 Boilerplate by paulirish, found here: 
+
+https://github.com/paulirish/html5-boilerplate)
+
+
+
+################
+WHAT IT DOES
+################
+
+The script runs through the steps that I found myself repeating over and over and over again.  It:
+
+1) Grabs the latest release of the SilverStripe installer (all the core SS files minus the sapphire and cms modules)
+2) Grabs the latest release of whatever other modules or projects are specified in the template.php file provided to it (the cms and sapphire modules, plus whatever else).
+3) Unpacks all of this stuff, setting the proper permissions.
+4) Creates a local cache folder
+5) Builds the DB
+6) Writes the _config.php and .htaccess files.
+7) Does an initial commit to your local git repo.
+
+
+
+################
+REQUIREMENTS:
+################
+
+1) The Piston rubygem must be installed (which obviously means that Ruby and Rubygems must also be installed — both come preinstalled on the current version of mac OSX).  It's used to pull in the extra modules, and makes it easy to update them individually.
+
+2) A SilverStripe _ss_environment.php file must be in your local environment's main web root.  For example, if you keep your SilverStripe projects in ~/Sites (i.e. ~/Sites/project1/, ~/Sites/project2/, etc.), then you'll put your _ss_environment.php file in the Sites folder, alongside your projects' roots.  You must specify the database host and user/pass for you setup in this file, and the $_FILE_TO_URL_MAPPING variable. See http://doc.silverstripe.org/sapphire/en/topics/environment-management for more info on the environment file.
+
+3) Sake, the SilverStripe command line tool, must be made executable from anywhere.  To do this, copy the sake file (sapphire/sake) to a directory in your system $PATH (usr/local/bin or usr/bin are common places).  Make sure it's executable (chmod 755).
+
+4) You'll need the git client installed.
+
+5) You'll need superuser access.
+
+
+
+################
+USAGE:
+################
+
+1) Copy the sssetup executable to a directory in your system $PATH (usr/local/bin or usr/bin are common places).  Make sure it's executable (chmod 755).
+
+2) Create your new project folder (e.g. mkdir ~/Sites/new_ss_project).  Navigate to that directory and initialize a new local git repository (cd ~/Sites/new_ss_project, git init).
+
+3) Run the script, specifying a database name and the template.php file you'd like Piston to use:
+
+sudo sssetup -db ss_newprojectdb -t ~/Git\ Projects/sssetup/template.php
+
+You should now be able to navigate to your project in the browser (e.g. http://localhost/new_ss_project/admin). 
