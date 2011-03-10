@@ -1,4 +1,7 @@
-#!/bin/bash -x
+#!/bin/bash
+
+# @author Jonathan Wohl
+# March 9, 2011
 
 # REQUIREMENTS: 
 # - sake installed as executable
@@ -14,6 +17,7 @@ database=
 dbu='root'
 dbp=''
 template=
+
 
 
 if [ $(id -u) = "0" ]; 
@@ -79,7 +83,6 @@ then
 	
 	# Add local cache folder
 	mkdir silverstripe-cache
-	sudo chmod -R 777 silverstripe-cache
 	
 	# Add the .htaccess file, and set all necessary file permissions
 	# TODO
@@ -88,11 +91,12 @@ then
 	chmod 777 mysite/_config.php
 	
 	# Ignore the cache and assets folders
-	touch .gitignore
-	echo ".DS_Store
+	# touch .gitignore
+	cat > .gitignore <<- _EOF_ 
+		.DS_Store
 		silverstripe-cache
 		assets
-	" > .gitignore
+	_EOF_
 	
 	# Add database to the mysite _config.php file
 	search_string="\$database = '';"
@@ -104,11 +108,15 @@ then
 	
 	# Add the base URL to the .htaccess file
 	# TODO: Add HTML5 Boilerplate base .htaccess rules
-	$search_string="RewriteEngine On"
-	$replace_string="RewriteEngine On
-	RewriteBase /
-	"
-	sed -i '' "s/$search_string/$replace_string/g" .htaccess
+	sed -i '' '/RewriteEngine\ On/ a\
+	\	RewriteBase \/'$database'\
+	\
+	\	# Rewrite rules for local development environments\
+	\	RewriteCond %{REQUEST_URI} ^/'$database'/(.*)\$\
+	\	RewriteCond %{REQUEST_FILENAME} !-f\
+	\	RewriteRule . /'$database'/sapphire/main.php?url=%1&%{QUERY_STRING} [L]\
+	\
+	\	# Should still work on production environment' .htaccess
 	
 	# Add to git repo and do an initial commit
 	git add *
@@ -117,6 +125,9 @@ then
 	# Build the database!
 	sake dev/build
 	
+	# Reset the permissions on the cache folder(s)
+	sudo chmod -R 777 silverstripe-cache
+
 	exit 0
 else
 	echo "You do not have permission to run sssetup."
